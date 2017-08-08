@@ -2,16 +2,16 @@ package types
 
 import (
 	"io"
-	"github.com/justblender/gominet/protocol"
+	"github.com/justblender/gominet/util"
 )
 
 type String string
 
 func (_ String) Decode(r io.Reader) (interface{}, error) {
-	s, err := protocol.ReadString(r)
+	s, err := util.ReadString(r)
 	return String(s), err
 }
 
 func (s String) Encode(w io.Writer) error {
-	return protocol.WriteString(w, string(s))
+	return util.WriteString(w, string(s))
 }

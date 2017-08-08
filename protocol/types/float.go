@@ -2,16 +2,16 @@ package types
 
 import (
 	"io"
-	"github.com/justblender/gominet/protocol"
+	"github.com/justblender/gominet/util"
 )
 
 type Float float32
 
 func (_ Float) Decode(r io.Reader) (interface{}, error) {
-	f, err := protocol.ReadFloat32(r)
+	f, err := util.ReadInt64(r)
 	return Float(f), err
 }
 
 func (f Float) Encode(w io.Writer) error {
-	return protocol.WriteFloat32(w, float32(f))
+	return util.WriteFloat32(w, float32(f))
 }

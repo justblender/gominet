@@ -1,10 +1,10 @@
-package types
+package protocol
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io"
 	"reflect"
+	"encoding/binary"
 )
 
 var ByteOrder = binary.BigEndian

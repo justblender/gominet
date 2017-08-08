@@ -2,35 +2,35 @@ package types
 
 import (
 	"io"
-	"github.com/justblender/gominet/protocol"
+	"github.com/justblender/gominet/util"
 )
 
 type Byte byte
 
 func (_ Byte) Decode(r io.Reader) (interface{}, error) {
-	b, err := protocol.ReadInt8(r)
+	b, err := util.ReadInt8(r)
 	return Byte(b), err
 }
 
 func (b Byte) Encode(w io.Writer) error {
-	return protocol.WriteInt8(w, int8(b))
+	return util.WriteInt8(w, int8(b))
 }
 
 type UByte uint8
 
 func (_ UByte) Decode(r io.Reader) (interface{}, error) {
-	b, err := protocol.ReadUint8(r)
+	b, err := util.ReadUint8(r)
 	return Byte(b), err
 }
 
 func (b UByte) Encode(w io.Writer) error {
-	return protocol.WriteUint8(w, uint8(b))
+	return util.WriteUint8(w, uint8(b))
 }
 
 type ByteArray []byte
 
 func (_ ByteArray) Decode(r io.Reader) (interface{}, error) {
-	l, err := protocol.ReadVarInt(r)
+	l, err := util.ReadVarInt(r)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (_ ByteArray) Decode(r io.Reader) (interface{}, error) {
 }
 
 func (b ByteArray) Encode(w io.Writer) error {
-	err := protocol.WriteVarInt(w, len(b))
+	err := util.WriteVarInt(w, len(b))
 	if err != nil {
 		return err
 	}

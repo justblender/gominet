@@ -1,12 +1,12 @@
 package gominet
 
 import (
-	"errors"
 	"fmt"
-	"net"
 	"io"
-	"github.com/justblender/gominet/protocol"
+	"net"
+	"errors"
 	"github.com/justblender/gominet/protocol/packet"
+	"github.com/justblender/gominet/protocol"
 )
 
 var NoHandlerException = errors.New("No packet handler has been specified")
