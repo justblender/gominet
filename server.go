@@ -19,7 +19,7 @@ type Server struct {
 	handler	 	Handler
 }
 
-type Handler func(protocol.Connection, packet.Holder)
+type Handler func(*protocol.Connection, packet.Holder)
 
 func NewServer(host string, port int, handler Handler) *Server {
 	return &Server{host: host, port: port, handler: handler}
@@ -66,6 +66,6 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 		}
 
 		// Run the handler
-		server.handler(*conn, t)
+		server.handler(conn, t)
 	}
 }
