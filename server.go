@@ -29,10 +29,10 @@ func (server *Server) SetHandler(handler Handler) {
 	server.handler = handler
 }
 
-func (server *Server) Serve() (err error) {
+func (server *Server) ListenAndServe() (err error) {
 	server.listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", server.host, server.port))
 	if err != nil {
-		return err
+		return
 	}
 
 	if server.handler == nil {
@@ -61,11 +61,15 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 				continue
 			}
 
-			fmt.Println("Error while handling packets: " + err.Error())
+			fmt.Println("Error while reading packet: " + err.Error())
 			break
 		}
 
-		// Run the handler
-		server.handler(conn, t)
+		err = server.handler(conn, t)
+		// TODO: I don't know what I should do here, I'll close connection for now
+		if err != nil {
+			fmt.Println("Error while handing packet: " + err.Error())
+			break
+		}
 	}
 }

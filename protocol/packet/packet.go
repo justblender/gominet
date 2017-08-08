@@ -3,9 +3,9 @@ package packet
 import "bytes"
 
 type Packet struct {
-	ID int
-	Direction Direction
-	Data bytes.Buffer
+	ID 			int
+	Direction 	Direction
+	Data 		bytes.Buffer
 }
 
 type Direction int

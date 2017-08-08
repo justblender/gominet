@@ -16,25 +16,15 @@ import (
 var UnknownPacketError = errors.New("unknown packet type")
 
 type Connection struct {
-	rw  io.ReadWriteCloser
-	smu sync.RWMutex
+	smu 		sync.RWMutex
+	rw  		io.ReadWriteCloser
 
-	State    State
-	Protocol uint16
-
-	Address  net.Addr
-	Username string
+	State 		State
+	Protocol 	uint16
 }
 
 func NewConnection(conn net.Conn) *Connection {
-	return &Connection{rw: conn, Address: conn.RemoteAddr(), State: Handshake}
-}
-
-func (c *Connection) SetState(s State) {
-	c.smu.Lock()
-	defer c.smu.Unlock()
-
-	c.State = s
+	return &Connection{rw: conn}
 }
 
 func (c *Connection) Next() (packet.Holder, error) {

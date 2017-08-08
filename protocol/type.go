@@ -7,7 +7,6 @@ import (
 )
 
 type Type interface {
-
 	Decode(r io.Reader) (interface{}, error)
 	Encode(w io.Writer) error
 }
