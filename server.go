@@ -19,7 +19,7 @@ type Server struct {
 	handler	 	Handler
 }
 
-type Handler func(*protocol.Connection, packet.Holder)
+type Handler func(*protocol.Connection, packet.Holder) error
 
 func NewServer(host string, port int, handler Handler) *Server {
 	return &Server{host: host, port: port, handler: handler}
