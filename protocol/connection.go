@@ -10,6 +10,7 @@ import (
 	"sync"
 	"github.com/justblender/gominet/protocol/packet"
 	"github.com/justblender/gominet/protocol/types"
+	"github.com/justblender/gominet/util"
 )
 
 var UnknownPacketError = errors.New("unknown packet type")
@@ -51,7 +52,7 @@ func (c *Connection) Write(h packet.Holder) (int, error) {
 		return -1, err
 	}
 
-	err = WriteVarInt(c.rw, data.Len())
+	err = util.WriteVarInt(c.rw, data.Len())
 	if err != nil {
 		return -1, err
 	}
@@ -73,7 +74,7 @@ func (c *Connection) Close() error {
 }
 
 func (c *Connection) packet() (*packet.Packet, error) {
-	length, err := ReadVarInt(c.rw)
+	length, err := util.ReadVarInt(c.rw)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +97,7 @@ func (c *Connection) packet() (*packet.Packet, error) {
 	}
 
 	buffer := bytes.NewBuffer(payload)
-	id, err := ReadVarInt(buffer)
+	id, err := util.ReadVarInt(buffer)
 
 	if err != nil {
 		return nil, err
@@ -120,7 +121,7 @@ func (c *Connection) decode(p *packet.Packet) (h packet.Holder, err error) {
 	for i := 0; i < inst.NumField(); i++ {
 		f := inst.Field(i)
 
-		typ, ok := f.Interface().(types.Type)
+		typ, ok := f.Interface().(Type)
 		if !ok {
 			continue
 		}
@@ -138,12 +139,12 @@ func (c *Connection) decode(p *packet.Packet) (h packet.Holder, err error) {
 
 func (c *Connection) encode(h packet.Holder) (*bytes.Buffer, error) {
 	out := new(bytes.Buffer)
-	WriteVarInt(out, h.ID())
+	util.WriteVarInt(out, h.ID())
 
 	v := reflect.ValueOf(h)
 
 	for i := 0; i < v.NumField(); i++ {
-		ftype, ok := v.Field(i).Interface().(types.Type)
+		ftype, ok := v.Field(i).Interface().(Type)
 		if !ok {
 			// XXX(taylor): special-casing
 			ftype = types.JSON{V: v.Field(i).Interface()}
