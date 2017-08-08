@@ -5,7 +5,7 @@ Basic Minecraft server library written on Golang and based on Taylor Blau's proj
 `go get -t github.com/justblender/gominet`
 
 ## Creating your own basic server:
-```
+```go
 package main
 
 import (
