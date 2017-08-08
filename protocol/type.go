@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
-	"encoding/binary"
 )
-
-var ByteOrder = binary.BigEndian
 
 type Type interface {
 
