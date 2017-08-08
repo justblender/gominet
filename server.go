@@ -30,13 +30,13 @@ func (server *Server) SetHandler(handler Handler) {
 }
 
 func (server *Server) ListenAndServe() (err error) {
+	if server.handler == nil {
+		return NoHandlerException
+	}
+
 	server.listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", server.host, server.port))
 	if err != nil {
 		return
-	}
-
-	if server.handler == nil {
-		return NoHandlerException
 	}
 
 	for {
