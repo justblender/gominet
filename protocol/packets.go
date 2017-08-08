@@ -2,8 +2,7 @@ package protocol
 
 import (
 	"reflect"
-
-	"github.com/justblender/minecraft/protocol/packet"
+	"github.com/justblender/gominet/protocol/packet"
 )
 
 var Packets = map[packet.Direction]map[State]map[int]reflect.Type{

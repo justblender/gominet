@@ -2,7 +2,7 @@ package types
 
 import (
 	"io"
-	"github.com/justblender/minecraft/protocol"
+	"github.com/justblender/gominet/protocol"
 )
 
 type Varint int

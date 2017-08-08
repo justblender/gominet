@@ -8,9 +8,8 @@ import (
 	"net"
 	"reflect"
 	"sync"
-
-	"github.com/justblender/minecraft/protocol/packet"
-	"github.com/justblender/minecraft/protocol/types"
+	"github.com/justblender/gominet/protocol/packet"
+	"github.com/justblender/gominet/protocol/types"
 )
 
 var UnknownPacketError = errors.New("unknown packet type")

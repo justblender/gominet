@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math"
-
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 /*

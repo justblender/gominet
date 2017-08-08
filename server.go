@@ -1,19 +1,20 @@
-package server
+package gominet
 
 import (
 	"errors"
 	"fmt"
 	"net"
 	"io"
-
-	"github.com/justblender/minecraft/protocol"
-	"github.com/justblender/minecraft/protocol/packet"
+	"github.com/justblender/gominet/protocol"
+	"github.com/justblender/gominet/protocol/packet"
 )
 
 var NoHandlerException = errors.New("No packet handler has been specified")
 
 type Server struct {
-	address 	string
+	host 		string
+	port 		int
+
 	listener	net.Listener
 	handler	 	Handler
 }
@@ -21,7 +22,7 @@ type Server struct {
 type Handler func(protocol.Connection, packet.Holder)
 
 func NewServer(host string, port int, handler Handler) *Server {
-	return &Server{address: fmt.Sprintf("%s:%d", host, port), handler: handler}
+	return &Server{host: host, port: port, handler: handler}
 }
 
 func (server *Server) SetHandler(handler Handler) {
@@ -29,7 +30,7 @@ func (server *Server) SetHandler(handler Handler) {
 }
 
 func (server *Server) Serve() (err error) {
-	server.listener, err = net.Listen("tcp", server.address)
+	server.listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", server.host, server.port))
 	if err != nil {
 		return err
 	}

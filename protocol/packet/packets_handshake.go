@@ -1,6 +1,6 @@
 package packet
 
-import "github.com/justblender/minecraft/protocol/types"
+import "github.com/justblender/gominet/protocol/types"
 
 type Handshake struct {
 	ProtocolVersion types.Varint

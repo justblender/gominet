@@ -1,8 +1,8 @@
 package packet
 
 import (
-	"github.com/justblender/minecraft/chat"
-	"github.com/justblender/minecraft/protocol/types"
+	"github.com/justblender/gominet/chat"
+	"github.com/justblender/gominet/protocol/types"
 )
 
 type LoginStart struct {
