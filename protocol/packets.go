@@ -1,11 +1,12 @@
 package protocol
 
 import (
+	"io"
 	"reflect"
 	"github.com/justblender/gominet/protocol/packet"
 )
 
-var Packets = map[packet.Direction]map[State]map[int]reflect.Type{
+var Packets = map[packet.Direction]map[State]map[int]reflect.Type {
 	packet.Serverbound: {
 		Handshake: {
 			0x00: reflect.TypeOf(packet.Handshake{}),
@@ -36,6 +37,11 @@ var Packets = map[packet.Direction]map[State]map[int]reflect.Type{
 			0x2E: reflect.TypeOf(packet.PlayPositionAndLook{}),
 		},
 	},
+}
+
+type Codec interface {
+	Decode(r io.Reader) (interface{}, error)
+	Encode(w io.Writer) error
 }
 
 func GetPacket(d packet.Direction, s State, id int) reflect.Type {

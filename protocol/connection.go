@@ -100,7 +100,7 @@ func (c *Connection) packet() (*packet.Packet, error) {
 	}, nil
 }
 
-func (c *Connection) decode(p *packet.Packet) (h packet.Holder, err error) {
+func (c *Connection) decode(p *packet.Packet) (packet.Holder, error) {
 	holder := c.getHolderType(p)
 	if holder == nil {
 		return nil, UnknownPacketError
@@ -111,12 +111,12 @@ func (c *Connection) decode(p *packet.Packet) (h packet.Holder, err error) {
 	for i := 0; i < inst.NumField(); i++ {
 		f := inst.Field(i)
 
-		typ, ok := f.Interface().(Type)
+		codec, ok := f.Interface().(Codec)
 		if !ok {
 			continue
 		}
 
-		v, err := typ.Decode(&p.Data)
+		v, err := codec.Decode(&p.Data)
 		if err != nil {
 			return nil, err
 		}
@@ -134,13 +134,13 @@ func (c *Connection) encode(h packet.Holder) (*bytes.Buffer, error) {
 	v := reflect.ValueOf(h)
 
 	for i := 0; i < v.NumField(); i++ {
-		ftype, ok := v.Field(i).Interface().(Type)
+		codec, ok := v.Field(i).Interface().(Codec)
 		if !ok {
 			// XXX(taylor): special-casing
-			ftype = types.JSON{V: v.Field(i).Interface()}
+			codec = types.JSON{V: v.Field(i).Interface()}
 		}
 
-		if err := ftype.Encode(out); err != nil {
+		if err := codec.Encode(out); err != nil {
 			return out, err
 		}
 	}

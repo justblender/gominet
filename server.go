@@ -56,19 +56,15 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 
 	for {
 		t, err := conn.Next()
-		if err != nil {
-			if err == io.EOF {
-				continue
-			}
-
-			fmt.Println("Error while reading packet: " + err.Error())
-			break
+		// Not sure if this yoda condition is right in golang,
+		// let's see how it goes
+		if io.EOF == err {
+			continue
 		}
 
-		err = server.handler(conn, t)
-		// TODO: I don't know what I should do here, I'll close connection for now
-		if err != nil {
-			fmt.Println("Error while handing packet: " + err.Error())
+		// Close the connection if error occurred while
+		// reading or handling packet
+		if err != nil || server.handler(conn, t) != nil {
 			break
 		}
 	}

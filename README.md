@@ -22,7 +22,7 @@ func main() {
 	server.ListenAndServe()
 }
 
-func handlePackets(conn *protocol.Connection, packet packet.Holder) (err error) {
+func handlePackets(conn *protocol.Connection, packet packet.Holder) error {
 	switch conn.State {
 	case protocol.Handshake:
 		handshake, ok := packet.(packet.Handshake)
