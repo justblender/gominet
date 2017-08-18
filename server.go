@@ -56,7 +56,7 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 	defer conn.Close()
 
 	for {
-		t, err := conn.Next()
+		holder, err := conn.Next()
 		if err != nil {
 			if err == io.EOF || err == protocol.UnknownPacketType {
 				continue
@@ -66,7 +66,7 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 			break
 		}
 
-		if err = server.handler(conn, t); err != nil {
+		if err = server.handler(conn, holder); err != nil {
 			log.Printf("Error occurred while handling packet: %v\n", err)
 			break
 		}
