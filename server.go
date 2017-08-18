@@ -2,6 +2,7 @@ package gominet
 
 import (
 	"fmt"
+	"log"
 	"io"
 	"net"
 	"errors"
@@ -42,11 +43,11 @@ func (server *Server) ListenAndServe() (err error) {
 	for {
 		client, err := server.listener.Accept()
 		if err != nil {
-			fmt.Println("Error occurred while accepting a connection: " + err.Error())
+			log.Printf("Error occurred while accepting a connection: %v\n", err)
 			continue
 		}
 
-		fmt.Println("Incoming connection from " + client.RemoteAddr().String())
+		log.Printf("Incoming connection from %s\n", client.RemoteAddr().String())
 		go server.handleConnection(protocol.NewConnection(client))
 	}
 }
@@ -56,15 +57,17 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 
 	for {
 		t, err := conn.Next()
-		// Not sure if this yoda condition is right in golang,
-		// let's see how it goes
-		if io.EOF == err {
-			continue
+		if err != nil {
+			if err == io.EOF || err == protocol.UnknownPacketType {
+				continue
+			}
+
+			log.Printf("Error occurred while reading packet: %v\n", err)
+			break
 		}
 
-		// Close the connection if error occurred while
-		// reading or handling packet
-		if err != nil || server.handler(conn, t) != nil {
+		if err = server.handler(conn, t); err != nil {
+			log.Printf("Error occurred while handling packet: %v\n", err)
 			break
 		}
 	}

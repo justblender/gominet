@@ -13,7 +13,7 @@ import (
 	"github.com/justblender/gominet/util"
 )
 
-var UnknownPacketError = errors.New("unknown packet type")
+var UnknownPacketType = errors.New("unknown packet type")
 
 type Connection struct {
 	smu 		sync.RWMutex
@@ -103,7 +103,7 @@ func (c *Connection) packet() (*packet.Packet, error) {
 func (c *Connection) decode(p *packet.Packet) (packet.Holder, error) {
 	holder := c.getHolderType(p)
 	if holder == nil {
-		return nil, UnknownPacketError
+		return nil, UnknownPacketType
 	}
 
 	inst := reflect.New(holder).Elem()
