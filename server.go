@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/justblender/gominet/protocol/packet"
 	"github.com/justblender/gominet/protocol"
+	"io"
 )
 
 var NoHandlerException = errors.New("No packet handler has been specified")
@@ -46,7 +47,7 @@ func (server *Server) ListenAndServe() (err error) {
 			continue
 		}
 
-		log.Println("Incoming connection from " + client.RemoteAddr().String())
+		// log.Println("Incoming connection from " + client.RemoteAddr().String())
 		go server.handleConnection(protocol.NewConnection(client))
 	}
 }
@@ -61,7 +62,8 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 				continue
 			}
 
-			log.Println("Lost connection: " + err.Error())
+			// Not sure what to do about this one..
+			// log.Println("Error occurred while reading packet: " + err.Error())
 			break
 		}
 

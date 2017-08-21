@@ -144,7 +144,7 @@ func (c *Connection) encode(h packet.Holder) (*bytes.Buffer, error) {
 		codec, ok := field.Interface().(codecs.Codec)
 		if !ok {
 			if field.Kind() == reflect.Struct {
-				codec = codecs.JSON{V: value.Field(i).Interface()}
+				codec = codecs.JSON{V: field.Interface()}
 			} else {
 				return nil, codecs.UnknownCodecType
 			}
