@@ -2,7 +2,7 @@ package packet
 
 import (
 	"github.com/justblender/gominet/chat"
-	"github.com/justblender/gominet/protocol/types"
+	"github.com/justblender/gominet/protocol/codecs"
 )
 
 type StatusRequest struct{}
@@ -28,13 +28,13 @@ type StatusResponse struct {
 func (_ StatusResponse) ID() int { return 0x00 }
 
 type StatusPing struct {
-	Payload types.Long
+	Payload 	codecs.Long
 }
 
 func (_ StatusPing) ID() int { return 0x01 }
 
 type StatusPong struct {
-	Payload types.Long
+	Payload 	codecs.Long
 }
 
 func (_ StatusPong) ID() int { return 0x01 }

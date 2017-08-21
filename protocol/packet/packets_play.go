@@ -2,48 +2,48 @@ package packet
 
 import (
 	"github.com/justblender/gominet/chat"
-	"github.com/justblender/gominet/protocol/types"
+	"github.com/justblender/gominet/protocol/codecs"
 )
 
 type PlayKeepAlive struct {
-	AliveId types.Varint
+	AliveId 	codecs.VarInt
 }
 
 func (_ PlayKeepAlive) ID() int { return 0x1F }
 
 type PlayChatMessage struct {
-	Chat     chat.TextComponent
-	Position types.Byte
+	Chat     	chat.TextComponent
+	Position 	codecs.Byte
 }
 
 func (_ PlayChatMessage) ID() int { return 0x0F }
 
 type PlayJoinGame struct {
-	EntityId   types.Int
-	Gamemode   types.UByte
-	Dimension  types.Int
-	Difficulty types.UByte
-	MaxPlayers types.UByte
-	LevelType  types.String
-	Debug      types.Bool
+	EntityId   	codecs.Int
+	Gamemode   	codecs.UnsignedByte
+	Dimension  	codecs.Int
+	Difficulty 	codecs.UnsignedByte
+	MaxPlayers 	codecs.UnsignedByte
+	LevelType  	codecs.String
+	Debug      	codecs.Boolean
 }
 
 func (_ PlayJoinGame) ID() int { return 0x23 }
 
 type PlaySpawnPosition struct {
-	Location types.Long
+	Location	codecs.Long
 }
 
 func (_ PlaySpawnPosition) ID() int { return 0x43 }
 
 type PlayPositionAndLook struct {
-	X     types.Double
-	Y     types.Double
-	Z     types.Double
-	Yaw   types.Float
-	Pitch types.Float
-	Flags types.Byte
-	Hueta types.Varint
+	X     		codecs.Double
+	Y     		codecs.Double
+	Z     		codecs.Double
+	Yaw   		codecs.Float
+	Pitch 		codecs.Float
+	Flags 		codecs.Byte
+	Data 		codecs.VarInt
 }
 
 func (_ PlayPositionAndLook) ID() int { return 0x2E }

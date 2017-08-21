@@ -6,7 +6,6 @@ import (
 	"math"
 	"errors"
 	"encoding/binary"
-	"github.com/satori/go.uuid"
 )
 
 func ReadString(reader io.Reader) (val string, err error) {
@@ -52,16 +51,6 @@ func ReadVarInt(reader io.Reader) (result int, err error) {
 		break
 	}
 
-	return
-}
-
-func ReadUUID(reader io.Reader) (result uuid.UUID, err error) {
-	bytes := make([]byte, 16)
-	_, err = reader.Read(bytes)
-	if err != nil {
-		return
-	}
-	result, _ = uuid.FromBytes(bytes)
 	return
 }
 

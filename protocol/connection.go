@@ -1,22 +1,27 @@
 package protocol
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
 	"io"
 	"net"
+	"fmt"
+	"bytes"
 	"reflect"
-	"sync"
-	"github.com/justblender/gominet/protocol/packet"
-	"github.com/justblender/gominet/protocol/types"
+	"errors"
 	"github.com/justblender/gominet/util"
+	"github.com/justblender/gominet/protocol/packet"
+	"github.com/justblender/gominet/protocol/codecs"
 )
 
-var UnknownPacketType = errors.New("unknown packet type")
+type State uint8
+
+const (
+	Handshake State = iota
+	Status
+	Login
+	Play
+)
 
 type Connection struct {
-	smu 		sync.RWMutex
 	rw  		io.ReadWriteCloser
 
 	State 		State
@@ -28,7 +33,7 @@ func NewConnection(conn net.Conn) *Connection {
 }
 
 func (c *Connection) Next() (packet.Holder, error) {
-	p, err := c.packet()
+	p, err := c.read()
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +68,7 @@ func (c *Connection) Close() error {
 	return nil
 }
 
-func (c *Connection) packet() (*packet.Packet, error) {
+func (c *Connection) read() (*packet.Packet, error) {
 	length, err := util.ReadVarInt(c.rw)
 	if err != nil {
 		return nil, err
@@ -101,7 +106,7 @@ func (c *Connection) packet() (*packet.Packet, error) {
 }
 
 func (c *Connection) decode(p *packet.Packet) (packet.Holder, error) {
-	holder := c.getHolderType(p)
+	holder := GetPacket(p.Direction, c.State, p.ID)
 	if holder == nil {
 		return nil, UnknownPacketType
 	}
@@ -109,48 +114,46 @@ func (c *Connection) decode(p *packet.Packet) (packet.Holder, error) {
 	inst := reflect.New(holder).Elem()
 
 	for i := 0; i < inst.NumField(); i++ {
-		f := inst.Field(i)
+		field := inst.Field(i)
 
-		codec, ok := f.Interface().(Codec)
+		codec, ok := field.Interface().(codecs.Codec)
 		if !ok {
-			continue
+			return nil, codecs.UnknownCodecType
 		}
 
-		v, err := codec.Decode(&p.Data)
+		value, err := codec.Decode(&p.Data)
 		if err != nil {
 			return nil, err
 		}
 
-		f.Set(reflect.ValueOf(v))
+		field.Set(reflect.ValueOf(value))
 	}
 
 	return inst.Interface().(packet.Holder), nil
 }
 
 func (c *Connection) encode(h packet.Holder) (*bytes.Buffer, error) {
-	out := new(bytes.Buffer)
-	util.WriteVarInt(out, h.ID())
+	buffer := new(bytes.Buffer)
+	util.WriteVarInt(buffer, h.ID())
 
-	v := reflect.ValueOf(h)
+	value := reflect.ValueOf(h)
 
-	for i := 0; i < v.NumField(); i++ {
-		codec, ok := v.Field(i).Interface().(Codec)
+	for i := 0; i < value.NumField(); i++ {
+		field := value.Field(i)
+
+		codec, ok := field.Interface().(codecs.Codec)
 		if !ok {
-			// XXX(taylor): special-casing
-			codec = types.JSON{V: v.Field(i).Interface()}
+			if field.Kind() == reflect.Struct {
+				codec = codecs.JSON{V: value.Field(i).Interface()}
+			} else {
+				return nil, codecs.UnknownCodecType
+			}
 		}
 
-		if err := codec.Encode(out); err != nil {
-			return out, err
+		if err := codec.Encode(buffer); err != nil {
+			return nil, err
 		}
 	}
 
-	return out, nil
-}
-
-func (c *Connection) getHolderType(p *packet.Packet) reflect.Type {
-	c.smu.RLock()
-	defer c.smu.RUnlock()
-
-	return GetPacket(p.Direction, c.State, p.ID)
+	return buffer, nil
 }

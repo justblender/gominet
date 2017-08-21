@@ -1,12 +1,12 @@
 package packet
 
-import "github.com/justblender/gominet/protocol/types"
+import "github.com/justblender/gominet/protocol/codecs"
 
 type Handshake struct {
-	ProtocolVersion types.Varint
-	ServerAddress   types.String
-	ServerPort      types.Short
-	NextState       types.Varint
+	ProtocolVersion codecs.VarInt
+	ServerAddress   codecs.String
+	ServerPort      codecs.UnsignedShort
+	NextState       codecs.VarInt
 }
 
 func (_ Handshake) ID() int { return 0x00 }

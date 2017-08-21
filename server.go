@@ -3,7 +3,6 @@ package gominet
 import (
 	"fmt"
 	"log"
-	"io"
 	"net"
 	"errors"
 	"github.com/justblender/gominet/protocol/packet"
@@ -43,11 +42,11 @@ func (server *Server) ListenAndServe() (err error) {
 	for {
 		client, err := server.listener.Accept()
 		if err != nil {
-			log.Printf("Error occurred while accepting a connection: %v\n", err)
+			log.Println("Error occurred while accepting a connection: " + err.Error())
 			continue
 		}
 
-		log.Printf("Incoming connection from %s\n", client.RemoteAddr().String())
+		log.Println("Incoming connection from " + client.RemoteAddr().String())
 		go server.handleConnection(protocol.NewConnection(client))
 	}
 }
@@ -58,16 +57,16 @@ func (server *Server) handleConnection(conn *protocol.Connection) {
 	for {
 		holder, err := conn.Next()
 		if err != nil {
-			if err == io.EOF || err == protocol.UnknownPacketType {
+			if err == protocol.UnknownPacketType {
 				continue
 			}
 
-			log.Printf("Error occurred while reading packet: %v\n", err)
+			log.Println("Lost connection: " + err.Error())
 			break
 		}
 
 		if err = server.handler(conn, holder); err != nil {
-			log.Printf("Error occurred while handling packet: %v\n", err)
+			log.Println("Error occurred while handling packet: " + err.Error())
 			break
 		}
 	}

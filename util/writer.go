@@ -4,7 +4,6 @@ import (
 	"io"
 	"math"
 	"encoding/binary"
-	"github.com/satori/go.uuid"
 )
 
 func WriteString(writer io.Writer, val string) (err error) {
@@ -28,11 +27,6 @@ func WriteVarInt(writer io.Writer, val int) (err error) {
 	}
 	err = WriteUint8(writer, byte(val))
 	return
-}
-
-func WriteUUID(writer io.Writer, val uuid.UUID) (err error) {
-	_, err = writer.Write(val[:])
-	return err
 }
 
 func WriteBool(writer io.Writer, val bool) (err error) {
