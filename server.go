@@ -5,9 +5,8 @@ import (
 	"log"
 	"net"
 	"errors"
-	"github.com/justblender/gominet/protocol/packet"
 	"github.com/justblender/gominet/protocol"
-	"io"
+	"github.com/justblender/gominet/protocol/packet"
 )
 
 var NoHandlerException = errors.New("No packet handler has been specified")

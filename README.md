@@ -9,8 +9,8 @@ Basic Minecraft server library written on Golang and based on Taylor Blau's proj
 package main
 
 import (
-	"errors"
 	"fmt"
+	"errors"
 	"reflect"
 	"github.com/justblender/gominet"
 	"github.com/justblender/gominet/protocol"
@@ -22,12 +22,12 @@ func main() {
 	server.ListenAndServe()
 }
 
-func handlePackets(conn *protocol.Connection, packet packet.Holder) error {
+func handlePackets(conn *protocol.Connection, holder packet.Holder) error {
 	switch conn.State {
 	case protocol.Handshake:
-		handshake, ok := packet.(packet.Handshake)
+		handshake, ok := holder.(packet.Handshake)
 		if !ok {
-			return errors.New(fmt.Sprintf("Expected handshake, received: %s", reflect.TypeOf(packet)))
+			return errors.New(fmt.Sprintf("Expected handshake, received: %s", reflect.TypeOf(holder)))
 		}
 
 		conn.Protocol = uint16(handshake.ProtocolVersion)

@@ -3,14 +3,19 @@ package protocol
 import (
 	"io"
 	"net"
-	"fmt"
 	"bytes"
 	"reflect"
-	"errors"
 	"github.com/justblender/gominet/util"
 	"github.com/justblender/gominet/protocol/packet"
 	"github.com/justblender/gominet/protocol/codecs"
 )
+
+type Connection struct {
+	rw  		io.ReadWriteCloser
+
+	State 		State
+	Protocol 	uint16
+}
 
 type State uint8
 
@@ -20,13 +25,6 @@ const (
 	Login
 	Play
 )
-
-type Connection struct {
-	rw  		io.ReadWriteCloser
-
-	State 		State
-	Protocol 	uint16
-}
 
 func NewConnection(conn net.Conn) *Connection {
 	return &Connection{rw: conn}
@@ -68,20 +66,14 @@ func (c *Connection) Close() error {
 	return nil
 }
 
-func (c *Connection) read() (*packet.Packet, error) {
+func (c *Connection) read() (*Packet, error) {
 	length, err := util.ReadVarInt(c.rw)
 	if err != nil {
 		return nil, err
 	}
 
-	if length < 0 {
-		err = errors.New(fmt.Sprintf("Decode, Packet length is below zero: %d", length))
-		return nil, err
-	}
-
-	if length > 1048576 { // 2^(21-1)
-		err = errors.New(fmt.Sprintf("Decode, Packet length is above maximum: %d", length))
-		return nil, err
+	if length < 0 || length > 1048576 { // 2^(21-1)
+		return nil, InvalidPacketLength
 	}
 
 	payload := make([]byte, length)
@@ -98,16 +90,16 @@ func (c *Connection) read() (*packet.Packet, error) {
 		return nil, err
 	}
 
-	return &packet.Packet{
+	return &Packet{
 		ID:        id,
-		Direction: packet.Serverbound,
+		Direction: Serverbound,
 		Data:      *buffer,
 	}, nil
 }
 
-func (c *Connection) decode(p *packet.Packet) (packet.Holder, error) {
-	holder := GetPacket(p.Direction, c.State, p.ID)
-	if holder == nil {
+func (c *Connection) decode(p *Packet) (packet.Holder, error) {
+	holder, ok := packets[p.Direction][c.State][p.ID]
+	if !ok {
 		return nil, UnknownPacketType
 	}
 
